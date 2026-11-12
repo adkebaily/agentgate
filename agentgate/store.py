@@ -16,17 +16,19 @@ def connect(path):
     return db
 
 
-def save_run(db, suite_name, reps, rows):
+def start_run(db, suite_name, reps):
     with db:
-        run_id = db.execute(
+        return db.execute(
             "INSERT INTO runs(suite, started_at, reps) VALUES (?, ?, ?)",
             (suite_name, datetime.now(timezone.utc).isoformat(timespec="seconds"), reps),
         ).lastrowid
-        db.executemany(
-            "INSERT INTO trials VALUES (?, ?, ?, ?, ?, ?)",
-            [(run_id, r["config"], r["case_id"], r["rep"], r["status"], json.dumps(r)) for r in rows],
-        )
-    return run_id
+
+
+def save_trial(db, run_id, r):
+    """Saved one by one, so a crash or Ctrl+C keeps the trials already paid for."""
+    with db:
+        db.execute("INSERT INTO trials VALUES (?, ?, ?, ?, ?, ?)",
+                   (run_id, r["config"], r["case_id"], r["rep"], r["status"], json.dumps(r)))
 
 
 def runs(db):

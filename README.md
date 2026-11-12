@@ -18,7 +18,7 @@ The demo uses a scripted fake model, so it needs no API key. Its numbers show ho
 
 ```bash
 git clone <this repo> && cd agentgate
-python -m unittest                                    # 15 tests
+python -m unittest                                    # 16 tests
 python -m agentgate run examples/suite.sim.json       # run the demo suite
 xdg-open report.html                                  # open the report (macOS: open)
 python -m agentgate show late-61-days --config router # read one transcript

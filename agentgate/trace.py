@@ -10,9 +10,9 @@ from . import pricing
 
 
 class Trace:
-    def __init__(self, client, model, effort=None, max_tokens=16000, timeout=300):
+    def __init__(self, client, model, effort=None, max_tokens=16000):
         self.client, self.model, self.effort = client, model, effort
-        self.max_tokens, self.timeout = max_tokens, timeout
+        self.max_tokens = max_tokens
         self.spans = []
 
     def llm(self, kind="llm", **kwargs):
@@ -21,7 +21,7 @@ class Trace:
         if self.effort:
             kwargs["output_config"] = {**kwargs.get("output_config", {}), "effort": self.effort}
         start = time.perf_counter()
-        response = self.client.messages.create(model=self.model, timeout=self.timeout, **kwargs)
+        response = self.client.messages.create(model=self.model, **kwargs)
         ms = (time.perf_counter() - start) * 1000
         # A score from a different model than the one asked for measures nothing.
         if not response.model.startswith(self.model):

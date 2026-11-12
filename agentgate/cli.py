@@ -22,18 +22,29 @@ def print_summary(rows):
 
 def cmd_run(args):
     suite = suite_mod.load(args.suite)
-    rows = suite_mod.run(
-        suite, suite_mod.make_client(suite), reps=args.reps, only=args.only,
-        configs=args.configs.split(",") if args.configs else None,
-        on_trial=lambda r: print(f"{MARK[r['status']]:>8}  {r['config']:<14}{r['case_id']:<28}${r['cost']:.5f}  {r['detail'][:80]}"),
-    )
+    db = store.connect(args.db)
+    run_id = store.start_run(db, suite["name"], args.reps)
+    rows = []
+
+    def on_trial(r):
+        store.save_trial(db, run_id, r)
+        rows.append(r)
+        print(f"{MARK[r['status']]:>8}  {r['config']:<14}{r['case_id']:<28}${r['cost']:.5f}  {r['detail'][:80]}")
+
+    try:
+        suite_mod.run(suite, suite_mod.make_client(suite), reps=args.reps, only=args.only,
+                      configs=args.configs.split(",") if args.configs else None, on_trial=on_trial)
+        interrupted = False
+    except KeyboardInterrupt:
+        interrupted = True
     if not rows:
         sys.exit("nothing ran: check --only and --configs")
-    run_id = store.save_run(store.connect(args.db), suite["name"], args.reps, rows)
     print_summary(rows)
     with open(args.report, "w") as f:
         f.write(report.build(suite["name"], run_id, rows))
     print(f"\nrun {run_id} saved to {args.db}; report: {args.report}")
+    if interrupted:
+        sys.exit(f"stopped early: {len(rows)} trials kept in run {run_id}; no baseline or gate on a partial run")
 
     baseline_path = args.baseline or args.suite.removesuffix(".json") + ".baseline.json"
     if args.save_baseline:

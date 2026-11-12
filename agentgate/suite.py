@@ -41,7 +41,8 @@ def make_client(suite):
     if "client" in suite:
         return resolve(suite["client"])()
     import anthropic  # only needed for real runs
-    return anthropic.Anthropic()
+    # A short connect timeout: a dead network fails in seconds instead of hanging for minutes per retry.
+    return anthropic.Anthropic(timeout=anthropic.Timeout(300.0, connect=10.0))
 
 
 def run_agent(agent, client, cfg, task, spans, judge_model):

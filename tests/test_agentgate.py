@@ -109,6 +109,30 @@ class Scoring(unittest.TestCase):
         self.assertEqual(trace.tool("nope", None), ("Error: unknown tool nope", True))
 
 
+class Interrupt(unittest.TestCase):
+    def test_ctrl_c_keeps_finished_trials_and_skips_the_baseline(self):
+        import os, subprocess, sys, tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            db, baseline = os.path.join(tmp, "t.db"), os.path.join(tmp, "b.json")
+            # Interrupt after the 3rd trial by making the 4th agent call raise KeyboardInterrupt.
+            code = (
+                "import sys, examples.support_agent as a; real = a.run; n = [0]\n"
+                "def run(task, trace):\n"
+                "    n[0] += 1\n"
+                "    if n[0] == 4: raise KeyboardInterrupt\n"
+                "    return real(task, trace)\n"
+                "a.run = run\n"
+                f"sys.argv = ['agentgate', '--db', {db!r}, 'run', 'examples/suite.sim.json', '--report', {os.path.join(tmp, 'r.html')!r}, '--baseline', {baseline!r}, '--save-baseline']\n"
+                "from agentgate.cli import main; main()\n"
+            )
+            proc = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("3 trials kept", proc.stderr)
+            self.assertFalse(os.path.exists(baseline))
+            from agentgate import store
+            self.assertEqual(len(store.load_run(store.connect(db))[2]), 3)
+
+
 class Report(unittest.TestCase):
     def test_report_escapes_model_output(self):
         rows = copy.deepcopy(ROWS[:1])
