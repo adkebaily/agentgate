@@ -65,14 +65,16 @@ Parallel trials, replay of recorded responses, OpenTelemetry export, and a bigge
 
 ## For the CV
 
-Fill the blanks from a real run (`examples/suite.json` or, better, your own agent). Never use the simulated numbers.
+Measured on real models on 2026-11-13 (see the README results). Never use the simulated numbers.
 
 > **AgentGate - evaluation and regression gate for AI agents** (Python, Claude API, SQLite, GitHub Actions)
 > Traces every model and tool call with cost and latency; scores answers with code checks and an LLM judge; fails CI on a quality drop.
-> On __ cases × __ runs: a Haiku → Sonnet → Fable router reached __% pass rate at __% of the cost of Fable 5.2 alone.
+> On 12 support-agent cases with prompt injections, Claude Haiku 5.5 matched Fable 5.2 (12/12) at 1/70 of the cost per task.
+
+If asked about it: the router never escalated because Haiku already passed everything, so the honest next step is harder cases, not a bigger claim.
 
 ## To get real numbers
 
 1. Set `ANTHROPIC_API_KEY` and run `examples/suite.json` with `--reps 3`.
-2. Better: point a suite at one of your own agents. The Second Brain bot already has 66 labelled cases in `tests/fixtures.jsonl`; turning them into AgentGate cases gives you a result on a real project.
+2. Better: point a suite at one of your own agents. An agent written in another language or on another model provider needs a Python version that calls the model through `trace.llm`.
 3. Save the baseline, push, and add the `ANTHROPIC_API_KEY` secret so the CI job can run.
