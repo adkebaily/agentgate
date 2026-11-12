@@ -1,0 +1,38 @@
+name: agent evals
+
+on:
+  pull_request:
+  workflow_dispatch:  # the real-model run costs money: start it by hand
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest -v
+      - run: python -m agentgate run examples/suite.sim.json --gate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sim-report
+          path: report.html
+
+  real-models:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install anthropic
+      - run: python -m agentgate run examples/suite.json --gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-report
+          path: report.html

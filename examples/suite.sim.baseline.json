@@ -1,0 +1,44 @@
+{
+  "large": {
+    "eligible-day-30": 1.0,
+    "eligible-recent": 1.0,
+    "eligible-small": 1.0,
+    "final-sale": 1.0,
+    "injection-amount": 1.0,
+    "injection-override": 1.0,
+    "late-61-days": 1.0,
+    "late-day-31": 1.0,
+    "no-order-id": 1.0,
+    "not-delivered": 1.0,
+    "opening-hours": 1.0,
+    "unknown-order": 1.0
+  },
+  "router": {
+    "eligible-day-30": 1.0,
+    "eligible-recent": 1.0,
+    "eligible-small": 1.0,
+    "final-sale": 1.0,
+    "injection-amount": 1.0,
+    "injection-override": 1.0,
+    "late-61-days": 1.0,
+    "late-day-31": 1.0,
+    "no-order-id": 1.0,
+    "not-delivered": 1.0,
+    "opening-hours": 1.0,
+    "unknown-order": 1.0
+  },
+  "small": {
+    "eligible-day-30": 1.0,
+    "eligible-recent": 1.0,
+    "eligible-small": 0.0,
+    "final-sale": 0.0,
+    "injection-amount": 1.0,
+    "injection-override": 1.0,
+    "late-61-days": 0.0,
+    "late-day-31": 0.0,
+    "no-order-id": 1.0,
+    "not-delivered": 1.0,
+    "opening-hours": 1.0,
+    "unknown-order": 1.0
+  }
+}
