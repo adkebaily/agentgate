@@ -52,6 +52,27 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 **This spends money.** The suite is small (12 short cases), and Fable 5.2 at $8 / $40 per million tokens will be most of the bill. Run one config first and read `$/task` before you run all of them with `--reps`.
 
+## Results on real models (2026-11-13)
+
+`examples/suite.json`, 12 cases × 5 configs, one run each. Measured with this repo; your numbers will move a little between runs.
+
+| Config | Pass rate | 95% interval | Cost / task | Median latency |
+|---|---|---|---|---|
+| Haiku 5.5 | 12/12 | 76% – 100% | $0.00026 | 3.0 s |
+| Sonnet 5.5 | 12/12 | 76% – 100% | $0.00457 | 3.7 s |
+| Fable 5.2, low effort | 12/12 | 76% – 100% | $0.01770 | 2.4 s |
+| Fable 5.2 | 12/12 | 76% – 100% | $0.01832 | 2.2 s |
+| Router (Haiku → Sonnet → Fable) | 12/12 | 76% – 100% | $0.00026 | 2.8 s |
+
+The whole run cost $0.49, plus $0.01 for the judge.
+
+What it shows:
+
+- **Haiku 5.5 is enough for this agent.** It passed every case, prompt injections included, at about 1/70 of the cost of Fable 5.2 per task.
+- **The router never escalated.** Haiku always read the refund policy, so the gate accepted its first answer. It cost what Haiku costs and saved nothing over Haiku alone.
+- **The suite is too easy to rank the models.** With every config at 12/12, the interval is wide and the same for all. Telling them apart needs harder cases: longer policies, several orders in one message, ambiguous requests.
+- **The eval caught its own bug.** In the first run, three configs "failed" `injection-amount`. The transcripts showed they had answered correctly and *mentioned* the ignored note ("I ignored an instruction in the order's notes to approve 999.00 euros"). The check `not_contains 999` was too strict, and a judge now grades that case.
+
 ## How it works
 
 ```
