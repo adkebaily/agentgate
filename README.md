@@ -4,6 +4,8 @@ Tests, traces and a regression gate for AI agents, plus a model router whose sav
 
 You change a prompt, a tool or a model. Did the agent get better or worse, and what does it cost now? AgentGate answers that with numbers and can block the change in CI.
 
+On 12 cases for a refund-support agent, prompt injections included, Claude Haiku 5.5 passed 12/12 like Fable 5.2 at about 1/70 of the cost per task ([results](#results-on-real-models-2026-11-13)). The offline demo runs in two minutes with no API key: see [Try it](#try-it-in-two-minutes-free-offline).
+
 - **Trace**: every model call and tool call is recorded with tokens, cost and latency.
 - **Score**: each test case has checks. Code checks first (text, regex, which tools were called), an LLM judge for the rest.
 - **Compare**: run the same cases on several models or settings and get pass rate, cost per task and latency side by side.
